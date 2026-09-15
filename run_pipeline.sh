@@ -20,13 +20,13 @@ nnUNetv2_plan_and_preprocess -d 101 102 103 --verify_dataset_integrity
 # 3. MENGAPLIKASIKAN STRATIFIED SPLITS
 echo "[3/5] Menerapkan splits_final.json (Stratified 5-Fold) ke folder preprocessed..."
 # Buat direktori jika belum ada secara paksa (aman)
-mkdir -p $nnUNet_preprocessed/Dataset101_SinusExp1
-mkdir -p $nnUNet_preprocessed/Dataset102_SinusExp2
-mkdir -p $nnUNet_preprocessed/Dataset103_SinusExp3
+mkdir -p "$nnUNet_preprocessed/Dataset101_SinusExp1"
+mkdir -p "$nnUNet_preprocessed/Dataset102_SinusExp2"
+mkdir -p "$nnUNet_preprocessed/Dataset103_SinusExp3"
 
-cp $nnUNet_raw/Dataset101_SinusExp1/splits_final.json $nnUNet_preprocessed/Dataset101_SinusExp1/
-cp $nnUNet_raw/Dataset102_SinusExp2/splits_final.json $nnUNet_preprocessed/Dataset102_SinusExp2/
-cp $nnUNet_raw/Dataset103_SinusExp3/splits_final.json $nnUNet_preprocessed/Dataset103_SinusExp3/
+cp "$nnUNet_raw/Dataset101_SinusExp1/splits_final.json" "$nnUNet_preprocessed/Dataset101_SinusExp1/"
+cp "$nnUNet_raw/Dataset102_SinusExp2/splits_final.json" "$nnUNet_preprocessed/Dataset102_SinusExp2/"
+cp "$nnUNet_raw/Dataset103_SinusExp3/splits_final.json" "$nnUNet_preprocessed/Dataset103_SinusExp3/"
 
 # 4. TRAINING
 # Secara default, kita jalankan FOLD 0 untuk Dataset 101 (Exp 1) demi mengejar preliminary results
@@ -41,13 +41,11 @@ nnUNetv2_train ${DATASET} 3d_fullres ${FOLD} -tr nnUNetTrainer_250epochs
 echo "[5/5] Melakukan Prediksi pada Held-out Test Set & Evaluasi Metrik..."
 # Pastikan folder output prediksi ada
 OUTPUT_PRED="${nnUNet_results}/Dataset101_SinusExp1/nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_${FOLD}/test_predictions"
-mkdir -p $OUTPUT_PRED
+mkdir -p "$OUTPUT_PRED"
 
 # Folder images test set berada di folder utama (karena nnU-Net raw isinya hanya train set yang belum dipisah secara folder)
-# Wait, nnU-Net butuh format _0000.nii.gz untuk predict.
-# Kita akan buat folder temporary berisi 30% images test set
 TEST_IMAGES_DIR="/home/D13K48009/raid/normal case_86/test_set_images"
-mkdir -p $TEST_IMAGES_DIR
+mkdir -p "$TEST_IMAGES_DIR"
 
 # Python untuk mengcopy test images
 python3 -c "
@@ -67,10 +65,10 @@ for c in cases:
 "
 
 # Jalankan Predict
-nnUNetv2_predict -i $TEST_IMAGES_DIR -o $OUTPUT_PRED -d ${DATASET} -c 3d_fullres -f ${FOLD} -tr nnUNetTrainer_250epochs
+nnUNetv2_predict -i "$TEST_IMAGES_DIR" -o "$OUTPUT_PRED" -d ${DATASET} -c 3d_fullres -f ${FOLD} -tr nnUNetTrainer_250epochs
 
 # Bersihkan temporary test images
-rm -rf $TEST_IMAGES_DIR
+rm -rf "$TEST_IMAGES_DIR"
 
 # Panggil script plotting
 echo "Menggambar metrik akhir..."

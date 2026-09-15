@@ -93,6 +93,11 @@ def main():
             })
             
     df = pd.DataFrame(all_scores)
+    
+    if df.empty:
+        print("ERROR: Tidak ada hasil prediksi yang berhasil diproses. Plotting dibatalkan.")
+        return
+        
     df.dropna(inplace=True) # Hapus kelas yang bernilai NaN (struktur anatomis absen)
     
     # 1. Simpan metrik ke CSV
