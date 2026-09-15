@@ -2,3 +2,5 @@ numpy==1.26.4
 nibabel==5.2.1
 pandas==2.2.1
 tqdm==4.66.2
+matplotlib==3.8.4
+seaborn==0.13.2
