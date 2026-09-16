@@ -32,7 +32,8 @@ def compute_dice(pred, gt, classes):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=int, default=101, help='ID Dataset (misal 101)')
-    parser.add_argument('--fold', type=int, default=0, help='Fold yang dilatih (misal 0)')
+    parser.add_argument('--fold', type=str, default="0", help='Fold yang dilatih (misal 0 atau all)')
+    parser.add_argument('--trainer', type=str, default="nnUNetTrainer", help='Nama Trainer nnU-Net')
     args = parser.parse_args()
     
     # Path Setup
@@ -54,11 +55,18 @@ def main():
     else:
         raise ValueError("Dataset tidak dikenali.")
 
-    pred_dir = os.path.join(
-        results_dir, 
-        exp_folder, 
-        f"nnUNetTrainer_250epochs__nnUNetPlans__3d_fullres/fold_{args.fold}/test_predictions"
-    )
+    if args.fold == "all":
+        pred_dir = os.path.join(
+            results_dir, 
+            exp_folder, 
+            f"{args.trainer}__nnUNetPlans__3d_fullres/ensemble_predictions"
+        )
+    else:
+        pred_dir = os.path.join(
+            results_dir, 
+            exp_folder, 
+            f"{args.trainer}__nnUNetPlans__3d_fullres/fold_{args.fold}/test_predictions"
+        )
     
     out_plot_dir = os.path.join(base_dir, "..", "Clara", "sinus-ct-train", "results_plots")
     os.makedirs(out_plot_dir, exist_ok=True)
@@ -109,7 +117,7 @@ def main():
     plt.figure(figsize=(10, 6))
     sns.set_theme(style="whitegrid")
     
-    ax = sns.boxplot(x="Class", y="Dice", data=df, palette="Set2")
+    ax = sns.boxplot(x="Class", y="Dice", hue="Class", data=df, palette="Set2", legend=False)
     sns.stripplot(x="Class", y="Dice", data=df, color=".25", alpha=0.5)
     
     plt.title(f"Performa Dice (Held-Out Test Set) - Eksperimen {args.dataset} (Fold {args.fold})")
