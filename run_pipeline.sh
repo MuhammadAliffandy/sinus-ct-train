@@ -7,12 +7,14 @@
 DATASET=101
 FOLD=0
 TRAINER="nnUNetTrainer" # Default ke 1000 epoch
+CONTINUE_FLAG=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -d|--dataset) DATASET="$2"; shift ;;
         -f|--fold) FOLD="$2"; shift ;;
         -tr|--trainer) TRAINER="$2"; shift ;;
+        -c|--continue) CONTINUE_FLAG="--c" ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
     shift
@@ -68,10 +70,10 @@ echo "Mungkin akan memakan waktu yang sangat lama. Duduk manis!"
 if [ "$FOLD" == "all" ]; then
     for i in {0..4}; do
         echo "--> Training Fold $i..."
-        nnUNetv2_train ${DATASET} 3d_fullres ${i} -tr ${TRAINER}
+        nnUNetv2_train ${DATASET} 3d_fullres ${i} -tr ${TRAINER} ${CONTINUE_FLAG}
     done
 else
-    nnUNetv2_train ${DATASET} 3d_fullres ${FOLD} -tr ${TRAINER}
+    nnUNetv2_train ${DATASET} 3d_fullres ${FOLD} -tr ${TRAINER} ${CONTINUE_FLAG}
 fi
 
 # 5. PREDICT PADA HELD-OUT TEST SET (30%)
