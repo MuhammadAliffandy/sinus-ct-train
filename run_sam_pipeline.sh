@@ -9,15 +9,23 @@ SAM_DATA_ANT="/home/D13K48009/raid/SAM_Dataset/Exp1_Anterior"
 SAM_DATA_POST="/home/D13K48009/raid/SAM_Dataset/Exp1_Posterior"
 WEIGHTS_PATH="${SAM_DIR}/sam_med3d_turbo.pth"
 
-echo "1. Memastikan folder imagesTr tersedia untuk SAM-Med3D (menggunakan Symlink agar hemat storage)..."
-mkdir -p "$SAM_DATA_ANT"
-mkdir -p "$SAM_DATA_POST"
-if [ ! -d "$SAM_DATA_ANT/imagesTr" ]; then
-    ln -s "$RAW_DATA_DIR/imagesTr" "$SAM_DATA_ANT/imagesTr"
-fi
-if [ ! -d "$SAM_DATA_POST/imagesTr" ]; then
-    ln -s "$RAW_DATA_DIR/imagesTr" "$SAM_DATA_POST/imagesTr"
-fi
+echo "1. Menyiapkan folder imagesTr untuk SAM-Med3D (menghapus akhiran _0000 dari format nnU-Net)..."
+# Hapus symlink lama jika ada
+rm -rf "$SAM_DATA_ANT/imagesTr" "$SAM_DATA_POST/imagesTr"
+mkdir -p "$SAM_DATA_ANT/imagesTr"
+mkdir -p "$SAM_DATA_POST/imagesTr"
+
+# Copy dan hilangkan _0000 agar namanya sama persis dengan label
+for img in "$RAW_DATA_DIR/imagesTr"/*_0000.nii.gz; do
+    filename=$(basename "$img")
+    new_filename=${filename/_0000/}
+    if [ ! -f "$SAM_DATA_ANT/imagesTr/$new_filename" ]; then
+        cp "$img" "$SAM_DATA_ANT/imagesTr/$new_filename"
+    fi
+    if [ ! -f "$SAM_DATA_POST/imagesTr/$new_filename" ]; then
+        cp "$img" "$SAM_DATA_POST/imagesTr/$new_filename"
+    fi
+done
 
 echo "2. Menyisipkan path dataset ke dalam kode sumber SAM-Med3D (utils/data_paths.py)..."
 # SAM-Med3D tidak pakai argumen --data_dir, melainkan membaca langsung dari file data_paths.py
