@@ -45,7 +45,7 @@ python train.py \
     --checkpoint "${WEIGHTS_PATH}" \
     --work_dir "/home/D13K48009/raid/SAM_results/Exp1_Anterior" \
     --num_epochs 100 \
-    --batch_size 2 \
+    --batch_size 1 \
     --lr 0.0001 \
     --num_workers 4
 
