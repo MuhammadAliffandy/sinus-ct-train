@@ -35,11 +35,12 @@ img_datas = [
 ]
 EOF
 
-echo "3. Memulai Fine-Tuning SAM-Med3D (Kelas Anterior)..."
+echo "3. Mem-patch train.py agar tidak crash pada Dice Loss (mengonversi tensor label menjadi float)..."
 cd ${SAM_DIR}
+sed -i 's/loss = self.seg_loss(prev_masks, gt3D)/loss = self.seg_loss(prev_masks, gt3D.float())/g' train.py
 
-# Kita jalankan 100 epoch dengan batch size 2. 
-# Jika CUDA Out of Memory, kurangi batch_size menjadi 1.
+echo "4. Memulai Fine-Tuning SAM-Med3D (Kelas Anterior)..."
+# Kita jalankan 100 epoch dengan batch size 1. 
 python train.py \
     --task_name "Sinus_Anterior" \
     --checkpoint "${WEIGHTS_PATH}" \
