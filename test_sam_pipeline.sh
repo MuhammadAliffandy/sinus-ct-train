@@ -21,7 +21,7 @@ python validation.py \
     -cp "$CHECKPOINT" \
     -tdp "$SAM_DATA_ANT" \
     -nc 1 \
-    --save_name "$RESULTS_DIR/test_metrics.txt"
+    --save_name "metrics.csv" > "$RESULTS_DIR/test_metrics.txt" 2>&1
 
 echo "=========================================="
 echo "Selesai! Hasil akurasi eksak telah disimpan di:"
