@@ -123,16 +123,19 @@ def run_inference(model, image_tensor, point_3d, device):
 
 def load_sam_model(ckpt_path, device):
     """Try loading SAM-Med3D model with multiple registry keys"""
-    from segment_anything.build_sam3D import sam_model_registry
+    from segment_anything.build_sam3D import sam_model_registry3D
     
     for key in ["vit_b_ori", "vit_b"]:
         try:
             print(f"  Trying model key '{key}'...")
-            sam_model = sam_model_registry[key](checkpoint=None)
+            sam_model = sam_model_registry3D[key](checkpoint=None)
             ckpt = torch.load(ckpt_path, map_location="cpu")
             
-            if "model_state_dict" in ckpt:
+            # Handle different checkpoint formats
+            if isinstance(ckpt, dict) and "model_state_dict" in ckpt:
                 sam_model.load_state_dict(ckpt["model_state_dict"])
+            elif isinstance(ckpt, dict) and "state_dict" in ckpt:
+                sam_model.load_state_dict(ckpt["state_dict"])
             else:
                 sam_model.load_state_dict(ckpt)
             
