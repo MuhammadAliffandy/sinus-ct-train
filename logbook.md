@@ -36,3 +36,14 @@ Logbook ini mencatat riwayat pekerjaan, kendala, dan keputusan arsitektur yang d
 | **Dokumentasi (Link/Ref)** | `prepare_sam_dataset.py`, `implementation_plan.md`, `walkthrough.md`, `task.md` |
 
 ---
+
+### 21 September 2026 - Penyelesaian Tahap 1 & Pause Proyek
+
+| **Aspek** | **Detail** |
+| :--- | :--- |
+| **Pekerjaan yang Dilakukan** | Melakukan *troubleshooting* pada *pipeline* SAM-Med3D (menangani isu `CUDA Out of Memory` dengan menurunkan *batch size* ke 1, dan membuat *auto-patch* untuk kompatibilitas tensor *float* di kalkulasi *Dice Loss* MONAI). |
+| **Kendala/Masalah** | Kebutuhan mendesak untuk beralih *(switch)* ke proyek lain sehingga eksperimen SAM-Med3D yang sedang/telah berjalan perlu dihentikan sementara atau direkapitulasi. |
+| **Solusi/Tindak Lanjut** | Menyimpan (merekap) semua *training logs* dari nnU-Net dan SAM-Med3D sebagai bukti pengerjaan Tahap 1. Proyek `sinus-ct-train` di-*pause* sementara dengan infrastruktur yang sudah sepenuhnya siap untuk dilanjutkan kapan saja. |
+| **Dokumentasi (Link/Ref)** | `run_sam_pipeline.sh` (Updated) |
+
+---
