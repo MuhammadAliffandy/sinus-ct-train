@@ -35,10 +35,19 @@ def load_nifti(path):
 def preprocess_image(image):
     """Z-score normalization (CT standard) and resize to 128^3"""
     image = np.clip(image, -1000, 1000) # Clip Hounsfield Units
-    mean = np.mean(image)
-    std = np.std(image)
+    
+    # SAM-Med3D uses ZNormalization on voxels > 0
+    fg_voxels = image[image > 0]
+    if len(fg_voxels) > 0:
+        mean = np.mean(fg_voxels)
+        std = np.std(fg_voxels)
+    else:
+        mean = np.mean(image)
+        std = np.std(image)
+        
     if std > 0:
         image = (image - mean) / std
+        
     tensor = torch.from_numpy(image).unsqueeze(0).unsqueeze(0).float()
     resized = F.interpolate(tensor, size=TARGET_SIZE, mode='trilinear', align_corners=False)
     return resized
@@ -51,12 +60,12 @@ def preprocess_label(label):
     return resized
 
 def get_center_point(mask_3d):
-    """Get center of mass of binary mask as point prompt [x, y, z]"""
+    """Get center of mass of binary mask as point prompt"""
     coords = np.where(mask_3d > 0.5)
     if len(coords[0]) == 0:
         return None
-    # SAM's grid_sample expects coordinates in reverse order of the tensor dimensions (W, H, D)
-    center = [int(np.mean(c)) for c in coords[::-1]]
+    # SAM-Med3D expects the coordinate order to match the tensor spatial dimensions exactly (D,H,W)
+    center = [int(np.mean(c)) for c in coords]
     return center
 
 def compute_surface_distances(pred_bin, gt_bin):
