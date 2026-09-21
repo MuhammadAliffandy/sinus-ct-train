@@ -7,7 +7,7 @@ echo "1. Mempersiapkan folder dataset validasi..."
 python split_sam_validation.py
 
 echo "2. Memastikan pustaka 'medim' terinstal..."
-pip install medim pandas numpy monai SimpleITK
+# Dihapus agar tidak menimpa instalasi PyTorch bawaan DGX
 
 echo "3. Menjalankan proses Inferensi SAM-Med3D (membuat prediksi 3D)..."
 # Jalankan inferensi dari dalam folder SAM-Med3D agar bisa membaca utils
