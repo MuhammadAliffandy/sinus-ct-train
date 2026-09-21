@@ -118,6 +118,12 @@ def run_inference(model, image_tensor, point_3d, device):
             multimask_output=False,
         )
         
+        # Resize prediction to match GT size (128x128x128)
+        if low_res_masks.shape[-3:] != tuple(TARGET_SIZE):
+            low_res_masks = F.interpolate(
+                low_res_masks, size=TARGET_SIZE, mode='trilinear', align_corners=False
+            )
+        
         pred = (torch.sigmoid(low_res_masks) > 0.5).float()
         return pred.cpu()
 
