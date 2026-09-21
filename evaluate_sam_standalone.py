@@ -33,9 +33,12 @@ def load_nifti(path):
     return img.get_fdata().astype(np.float32)
 
 def preprocess_image(image):
-    """Normalize to [0,1] and resize to 128^3"""
-    if image.max() > image.min():
-        image = (image - image.min()) / (image.max() - image.min())
+    """Z-score normalization (CT standard) and resize to 128^3"""
+    image = np.clip(image, -1000, 1000) # Clip Hounsfield Units
+    mean = np.mean(image)
+    std = np.std(image)
+    if std > 0:
+        image = (image - mean) / std
     tensor = torch.from_numpy(image).unsqueeze(0).unsqueeze(0).float()
     resized = F.interpolate(tensor, size=TARGET_SIZE, mode='trilinear', align_corners=False)
     return resized
@@ -48,11 +51,12 @@ def preprocess_label(label):
     return resized
 
 def get_center_point(mask_3d):
-    """Get center of mass of binary mask as point prompt [z, y, x]"""
+    """Get center of mass of binary mask as point prompt [x, y, z]"""
     coords = np.where(mask_3d > 0.5)
     if len(coords[0]) == 0:
         return None
-    center = [int(np.mean(c)) for c in coords]
+    # SAM's grid_sample expects coordinates in reverse order of the tensor dimensions (W, H, D)
+    center = [int(np.mean(c)) for c in coords[::-1]]
     return center
 
 def compute_surface_distances(pred_bin, gt_bin):
